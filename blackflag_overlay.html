@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Black Flag Stream Overlay</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif; 
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+            user-select: none; 
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background-color: transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- THEMED WEBCAM FRAME --- */
+        .webcam-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 40px;
+            width: 426px; 
+            height: 240px;
+            
+            border: 3px solid #750b0b; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            border-radius: 4px;
+        }
+
+        .webcam-label {
+            position: absolute;
+            top: -24px;
+            left: -3px;
+            background: #750b0b; 
+            color: #ffffff; 
+            padding: 2px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px 4px 0 0;
+            text-shadow: none;
+        }
+
+        /* --- STATS BAR (Top Center) --- */
+        .stats-bar {
+            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 50px;
+            background: rgba(15, 15, 18, 0.95);
+            border-bottom: 3px solid #750b0b; 
+            border-left: 3px solid #750b0b; 
+            border-right: 3px solid #750b0b; 
+            padding: 12px 40px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(117, 11, 11, 0.6); 
+        }
+
+        .stat-label {
+            margin-top: 4px;
+            font-size: 14px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            margin-top: 1px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #a61717; 
+            font-family: 'Courier New', Courier, monospace; 
+            min-width: 110px;
+            transition: transform 0.1s;
+        }
+        
+        .death-value {
+            min-width: 40px;
+        }
+
+        @keyframes flashRed {
+            0% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
+            50% { color: #ff2222; text-shadow: 0 0 20px #ff2222; transform: scale(1.2); }
+            100% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); transform: scale(1); }
+        }
+        
+        .flash {
+            animation: flashRed 0.6s ease-out;
+            display: inline-block;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-item">
+            <span class="stat-icon">⏳</span>
+            <div>
+                <div class="stat-label">Time Played</div>
+                <div class="stat-value" id="timer-display">00:00:00</div>
+            </div>
+        </div>
+        
+        <div class="stat-item">
+            <span class="stat-icon">☠️</span>
+            <div>
+                <div class="stat-label">Desynchronizations</div>
+                <div class="stat-value death-value" id="death-display">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="webcam-container" id="webcam-frame">
+        <div class="webcam-label">theFunkySoul</div>
+    </div>
+
+    <script>
+        const timerDisplay = document.getElementById('timer-display');
+        const deathDisplay = document.getElementById('death-display');
+        const statsBar = document.getElementById('stats-bar');
+        const webcamFrame = document.getElementById('webcam-frame');
+        let currentDeaths = -1;
+
+        function updateOverlay() {
+            const script = document.createElement('script');
+            script.src = 'data.js?cache_bypass=' + Date.now();
+            
+            // When the script loads, update the HTML
+            script.onload = function() {
+                if (typeof overlayData !== 'undefined') {
+
+                    // Update Visibility
+                    if (overlayData.show_topbar !== false) {
+                        statsBar.style.display = "flex";
+                    } else {
+                        statsBar.style.display = "none";
+                    }
+
+                    if (overlayData.show_webcam !== false) {
+                        webcamFrame.style.display = "block";
+                    } else {
+                        webcamFrame.style.display = "none";
+                    }
+                    
+                    // Update Timer
+                    timerDisplay.innerText = overlayData.timer_string;
+                    if (overlayData.is_running) {
+                        timerDisplay.style.color = "#a61717";
+                    } else {
+                        timerDisplay.style.color = "#aaaaaa";
+                    }
+
+                    // Update Deaths & Trigger Flash if increased
+                    if (currentDeaths !== -1 && overlayData.deaths > currentDeaths) {
+                        deathDisplay.classList.remove('flash');
+                        void deathDisplay.offsetWidth; // Force a DOM reflow
+                        deathDisplay.classList.add('flash');
+                    }
+                    deathDisplay.innerText = overlayData.deaths;
+                    currentDeaths = overlayData.deaths;
+                }
+                
+                // Clean up the old script tag to prevent memory leaks
+                document.head.removeChild(script);
+            };
+
+            // Inject into page
+            document.head.appendChild(script);
+        }
+
+        // Check for updates every sec
+        setInterval(updateOverlay, 1000);
+        updateOverlay();
+    </script>
+</body>
+</html>

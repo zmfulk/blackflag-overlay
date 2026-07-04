@@ -1,0 +1,8 @@
+# Ignore the live data file
+data.js
+
+# Ignore Python cache and build folders (if you compile to .exe later)
+__pycache__/
+build/
+dist/
+*.spec
