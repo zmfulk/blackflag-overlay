@@ -34,6 +34,7 @@
             border: 3px solid #750b0b; 
             box-shadow: 0 8px 20px rgba(0,0,0,0.7);
             border-radius: 4px;
+            background: rgba(15, 15, 18, 0.85);
         }
 
         .webcam-label {
@@ -51,20 +52,21 @@
             text-shadow: none;
         }
 
-        /* --- STATS BAR (Top Center) --- */
+        /* --- STATS BAR (Under Webcam) --- */
         .stats-bar {
             position: absolute;
-            top: 0px;
-            left: 50%;
-            transform: translateX(-50%);
+            /* 120px is half the webcam height, plus 20px gap */
+            top: calc(50% + 140px); 
+            right: 40px;
+            width: 426px; /* Perfectly matches webcam width */
+            
             display: flex;
-            gap: 50px;
+            justify-content: center;
+            gap: 20px;
             background: rgba(15, 15, 18, 0.95);
-            border-bottom: 3px solid #750b0b; 
-            border-left: 3px solid #750b0b; 
-            border-right: 3px solid #750b0b; 
-            padding: 12px 40px;
-            border-radius: 0 0 12px 12px;
+            border: 3px solid #750b0b; /* Full border */
+            padding: 12px 15px;
+            border-radius: 8px; /* Rounded corners on all sides */
             box-shadow: 0 6px 20px rgba(0,0,0,0.8);
         }
 
@@ -94,7 +96,7 @@
             font-weight: bold;
             color: #a61717; 
             font-family: 'Courier New', Courier, monospace; 
-            min-width: 110px;
+            min-width: 90px;
             transition: transform 0.1s;
         }
         
@@ -117,6 +119,10 @@
 </head>
 <body>
 
+    <div class="webcam-container" id="webcam-frame">
+        <div class="webcam-label">theFunkySoul</div>
+    </div>
+
     <div class="stats-bar" id="stats-bar">
         <div class="stat-item">
             <span class="stat-icon">⏳</span>
@@ -135,25 +141,21 @@
         </div>
     </div>
 
-    <div class="webcam-container" id="webcam-frame">
-        <div class="webcam-label">theFunkySoul</div>
-    </div>
-
     <script>
         const timerDisplay = document.getElementById('timer-display');
         const deathDisplay = document.getElementById('death-display');
         const statsBar = document.getElementById('stats-bar');
         const webcamFrame = document.getElementById('webcam-frame');
-        let currentDeaths = -1;
+        
+        let currentDeaths = -1; 
 
         function updateOverlay() {
             const script = document.createElement('script');
             script.src = 'data.js?cache_bypass=' + Date.now();
             
-            // When the script loads, update the HTML
             script.onload = function() {
                 if (typeof overlayData !== 'undefined') {
-
+                    
                     // Update Visibility
                     if (overlayData.show_topbar !== false) {
                         statsBar.style.display = "flex";
@@ -166,7 +168,7 @@
                     } else {
                         webcamFrame.style.display = "none";
                     }
-                    
+
                     // Update Timer
                     timerDisplay.innerText = overlayData.timer_string;
                     if (overlayData.is_running) {
@@ -178,22 +180,19 @@
                     // Update Deaths & Trigger Flash if increased
                     if (currentDeaths !== -1 && overlayData.deaths > currentDeaths) {
                         deathDisplay.classList.remove('flash');
-                        void deathDisplay.offsetWidth; // Force a DOM reflow
+                        void deathDisplay.offsetWidth; 
                         deathDisplay.classList.add('flash');
                     }
                     deathDisplay.innerText = overlayData.deaths;
                     currentDeaths = overlayData.deaths;
                 }
                 
-                // Clean up the old script tag to prevent memory leaks
                 document.head.removeChild(script);
             };
 
-            // Inject into page
             document.head.appendChild(script);
         }
 
-        // Check for updates every sec
         setInterval(updateOverlay, 1000);
         updateOverlay();
     </script>
