@@ -10,7 +10,6 @@
             padding: 0;
             font-family: 'Georgia', serif; 
             color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
             user-select: none; 
         }
 
@@ -31,90 +30,113 @@
             width: 426px; 
             height: 240px;
             
-            border: 3px solid #750b0b; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            
+            border: 2px solid #750b0b; 
+            border-bottom: 3px solid #5a0707;
+            box-shadow: 0 12px 25px rgba(0,0,0,0), 0 0 15px rgba(117,11,11,0.3), inset 0 0 30px rgba(0,0,0,0.5);
             border-radius: 4px;
-            background: rgba(15, 15, 18, 0.85);
         }
 
         .webcam-label {
             position: absolute;
-            top: -24px;
-            left: -3px;
-            background: #750b0b; 
-            color: #ffffff; 
-            padding: 2px 12px;
-            font-size: 14px;
+            top: -27px;
+            left: -2px;
+            
+            background: linear-gradient(to bottom, #8a1010, #5a0707); 
+            border: 1px solid #a61717;
+            border-bottom: none;
+            
+            color: #f0f0f0; 
+            padding: 4px 16px;
+            font-size: 13px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             border-radius: 4px 4px 0 0;
-            text-shadow: none;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.6);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         /* --- STATS BAR (Under Webcam) --- */
         .stats-bar {
             position: absolute;
-            /* 120px is half the webcam height, plus 20px gap */
             top: calc(50% + 140px); 
             right: 40px;
-            width: 426px; /* Perfectly matches webcam width */
+            width: 426px; 
             
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            background: rgba(15, 15, 18, 0.95);
-            border: 3px solid #750b0b; /* Full border */
-            padding: 12px 15px;
-            border-radius: 8px; /* Rounded corners on all sides */
-            box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+            justify-content: space-evenly; /* Spreads them perfectly */
+            align-items: center;
+            
+            /* Frosted gradient background */
+            background: linear-gradient(to right, rgba(10, 10, 12, 0.85), rgba(25, 15, 15, 0.9), rgba(10, 10, 12, 0.85));
+            backdrop-filter: blur(6px); /* Blurs the game behind the stats */
+            
+            border: 2px solid #750b0b; 
+            border-top: 1px solid #a61717; /* Highlighted top edge to catch the 'light' */
+            border-radius: 6px; 
+            padding: 10px 0;
+            
+            box-shadow: 0 8px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.6);
+        }
+
+        /* HUD Divider line between the two stats */
+        .stats-divider {
+            height: 45px;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, #750b0b, transparent);
+            box-shadow: 0 0 5px rgba(166, 23, 23, 0.5);
         }
 
         .stat-item {
             display: flex;
             align-items: center;
             gap: 12px;
+            width: 45%;
+            justify-content: center;
         }
 
         .stat-icon {
-            font-size: 22px;
-            text-shadow: 0 0 10px rgba(117, 11, 11, 0.6); 
+            font-size: 24px;
+            filter: drop-shadow(0 0 6px rgba(166, 23, 23, 0.7)); /* Makes emojis glow cleanly */
+        }
+
+        .stat-text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .stat-label {
-            margin-top: 4px;
-            font-size: 14px;
+            font-size: 12px;
             color: #ffffff;
-            text-transform: uppercase;
+            font-variant: small-caps; /* Gives it a classic, elegant look */
             letter-spacing: 2px;
             font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+            margin-bottom: 1px;
+            margin-top: 7px;
         }
 
         .stat-value {
-            margin-top: 1px;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             color: #a61717; 
             font-family: 'Courier New', Courier, monospace; 
-            min-width: 90px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); /* Ambient red glow */
             transition: transform 0.1s;
-        }
-        
-        .death-value {
-            min-width: 40px;
         }
 
         @keyframes flashRed {
-            0% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
-            50% { color: #ff2222; text-shadow: 0 0 20px #ff2222; transform: scale(1.2); }
-            100% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); transform: scale(1); }
+            0% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); }
+            50% { color: #ff3333; text-shadow: 0 0 25px #ff3333, 0 0 10px #ff3333; transform: scale(1.15); }
+            100% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); transform: scale(1); }
         }
         
         .flash {
             animation: flashRed 0.6s ease-out;
             display: inline-block;
         }
-
     </style>
 </head>
 <body>
@@ -126,17 +148,19 @@
     <div class="stats-bar" id="stats-bar">
         <div class="stat-item">
             <span class="stat-icon">⏳</span>
-            <div>
-                <div class="stat-label">Time Played</div>
+            <div class="stat-text-container">
+                <div class="stat-label" >TIME PLAYED</div>
                 <div class="stat-value" id="timer-display">00:00:00</div>
             </div>
         </div>
         
+        <div class="stats-divider"></div>
+        
         <div class="stat-item">
             <span class="stat-icon">☠️</span>
-            <div>
-                <div class="stat-label">Desynchronizations</div>
-                <div class="stat-value death-value" id="death-display">0</div>
+            <div class="stat-text-container">
+                <div class="stat-label">DESYNCS</div> 
+                <div class="stat-value" id="death-display">0</div>
             </div>
         </div>
     </div>
@@ -174,7 +198,7 @@
                     if (overlayData.is_running) {
                         timerDisplay.style.color = "#a61717";
                     } else {
-                        timerDisplay.style.color = "#aaaaaa";
+                        timerDisplay.style.color = "#777777";
                     }
 
                     // Update Deaths & Trigger Flash if increased
