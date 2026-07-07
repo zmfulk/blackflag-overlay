@@ -65,15 +65,15 @@
             width: 426px; 
             
             display: flex;
-            justify-content: space-evenly; /* Spreads them perfectly */
+            justify-content: space-evenly; 
             align-items: center;
             
             /* Frosted gradient background */
-            background: linear-gradient(to right, rgba(10, 10, 12, 0.85), rgba(25, 15, 15, 0.9), rgba(10, 10, 12, 0.85));
+            background: linear-gradient(to right, rgba(100, 0, 0, 0.8), rgba(5, 0, 0, 0.9), rgba(10, 10, 12, 1));
             backdrop-filter: blur(6px); /* Blurs the game behind the stats */
             
             border: 2px solid #750b0b; 
-            border-top: 1px solid #a61717; /* Highlighted top edge to catch the 'light' */
+            border-top: 1px solid #a61717; 
             border-radius: 6px; 
             padding: 10px 0;
             
@@ -84,7 +84,7 @@
         .stats-divider {
             height: 45px;
             width: 2px;
-            background: linear-gradient(to bottom, transparent, #750b0b, transparent);
+            background: linear-gradient(to bottom, transparent, #ff0000, transparent);
             box-shadow: 0 0 5px rgba(166, 23, 23, 0.5);
         }
 
@@ -121,9 +121,9 @@
         .stat-value {
             font-size: 26px;
             font-weight: bold;
-            color: #a61717; 
+            color: #ff0000; 
             font-family: 'Courier New', Courier, monospace; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); /* Ambient red glow */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255, 0, 0, 0.5); /* Ambient red glow */
             transition: transform 0.1s;
         }
 
@@ -196,7 +196,7 @@
                     // Update Timer
                     timerDisplay.innerText = overlayData.timer_string;
                     if (overlayData.is_running) {
-                        timerDisplay.style.color = "#a61717";
+                        timerDisplay.style.color = "#ff0000";
                     } else {
                         timerDisplay.style.color = "#777777";
                     }
