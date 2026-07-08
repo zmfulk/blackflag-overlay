@@ -27,19 +27,36 @@
             top: 50%;
             transform: translateY(-50%);
             right: 40px;
-            width: 426px; 
+            width: 424px; 
             height: 240px;
             
-            
-            border: 2px solid #750b0b; 
-            border-bottom: 3px solid #5a0707;
             box-shadow: 0 12px 25px rgba(0,0,0,0), 0 0 15px rgba(117,11,11,0.3), inset 0 0 30px rgba(0,0,0,0.5);
             border-radius: 4px;
         }
 
+        .webcam-container::before {
+            content: "";
+            position: absolute;
+            inset: -2px; 
+            border-radius: 4px;
+            padding: 2px; 
+            
+            /* The Saber Gradient: dark red base with a glowing bright red edge */
+            background: conic-gradient(from var(--angle), #3a0404 0%, #5a0707 85%, #ac0e0e 100%);
+
+            /* Magic Mask: Hides the center so your camera feed stays transparent */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            
+            /* The Animation */
+            animation: spin-saber 12s linear infinite;
+            z-index: -1;
+        }
+
         .webcam-label {
             position: absolute;
-            top: -27px;
+            top: -26px;
             left: -2px;
             
             background: linear-gradient(to bottom, #8a1010, #5a0707); 
@@ -47,7 +64,7 @@
             border-bottom: none;
             
             color: #f0f0f0; 
-            padding: 4px 16px;
+            padding: 4px 16px 4px 8px;
             font-size: 13px;
             font-weight: bold;
             text-transform: uppercase;
@@ -60,9 +77,9 @@
         /* --- STATS BAR (Under Webcam) --- */
         .stats-bar {
             position: absolute;
-            top: calc(50% + 125px); 
-            right: 40px;
-            width: 426px; 
+            top: calc(50% + 126px); 
+            right: 38px;
+            width: 430px; 
             
             display: flex;
             justify-content: space-evenly; 
@@ -131,8 +148,8 @@
         .objective-bar {
             position: absolute;
             top: 745px;
-            right: 40px;
-            width: 426px; 
+            right: 38px;
+            width: 430px; 
             
             display: none;
             justify-content: flex-start;
@@ -168,10 +185,64 @@
             margin-right: 8px;
         }
 
+        
+        .ac-logo {
+            height: 14px; 
+            width: auto;
+            vertical-align: top;
+            margin-right: 1px; 
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8)); 
+        }
+
         @keyframes flashRed {
             0% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); }
             50% { color: #ff3333; text-shadow: 0 0 25px #ff3333, 0 0 10px #ff3333; transform: scale(1.15); }
             100% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); transform: scale(1); }
+        }
+
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        @keyframes spin-saber {
+            from { --angle: 0deg; }
+            to { --angle: 360deg; }
+        }
+
+        .stat-item, .stats-divider {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- ANIMUS PARTICLES --- */
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            pointer-events: none; 
+            overflow: hidden; 
+            z-index: 1; 
+            border-radius: 4px;
+        }
+
+        .animus-particle {
+            position: absolute;
+            bottom: -15px; 
+            width: 2px;
+            border-radius: 1px;
+            opacity: 0;
+            animation: float-up linear infinite;
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(0); opacity: 0; }
+            20% { opacity: 0.6; } 
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-90px); opacity: 0; } 
         }
         
         .flash {
@@ -182,13 +253,21 @@
 </head>
 <body>
 
+    
+
     <div class="webcam-container" id="webcam-frame">
-        <div class="webcam-label">theFunkySoul</div>
+        <div class="webcam-label">
+            <img src="ac_logo.png" class="ac-logo">
+            theFunkySoul
+        </div>
     </div>
 
     
 
     <div class="stats-bar" id="stats-bar">
+
+        <div class="particle-container" id="particle-container"></div>
+
         <div class="stat-item">
             <span class="stat-icon">⏳</span>
             <div class="stat-text-container">
@@ -210,7 +289,7 @@
 
     <div class="objective-bar" id="objective-bar">
         <div class="objective-text">
-            <span class="objective-prefix">CURRENT OBJ:</span>
+            <span class="objective-prefix"></span>
             <span id="objective-display"></span>
         </div>
     </div>
@@ -225,6 +304,33 @@
         
         let currentDeaths = -1; 
         let currentSeconds = -1;
+
+        function spawnAnimusParticles() {
+            const container = document.getElementById('particle-container');
+            const particleCount = 12; 
+
+            for (let i = 0; i < particleCount; i++) {
+                let particle = document.createElement('div');
+                particle.classList.add('animus-particle');
+
+                let startPosX = Math.random() * 100;    
+                let duration = Math.random() * 2.5 + 2; 
+                let delay = Math.random() * 5; 
+                let size = Math.random() * 20 + 5; 
+
+                particle.style.left = startPosX + '%';
+                particle.style.animationDuration = duration + 's';
+                particle.style.animationDelay = delay + 's';
+                particle.style.height = size + 'px';
+
+                particle.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                particle.style.boxShadow = '0 0 5px rgba(255, 255, 255, 0.4)';
+
+                container.appendChild(particle);
+            }
+        }
+        
+        spawnAnimusParticles();
 
         function updateOverlay() {
             const script = document.createElement('script');
@@ -258,7 +364,7 @@
                         objectiveBar.style.display = "none";
                     }
 
-                    // Update Timer
+                    
                     timerDisplay.innerText = overlayData.timer_string;
                     if (overlayData.is_running) {
                         timerDisplay.style.color = "#ff0000";
@@ -266,7 +372,7 @@
                         timerDisplay.style.color = "#777777";
                     }
 
-                    // Update Deaths & Trigger Flash if increased
+                    
                     if (currentDeaths !== -1 && overlayData.deaths > currentDeaths) {
                         deathDisplay.classList.remove('flash');
                         void deathDisplay.offsetWidth; 
@@ -275,7 +381,7 @@
                     deathDisplay.innerText = overlayData.deaths;
                     currentDeaths = overlayData.deaths;
 
-                    // Trigger Flash every 60 seconds)
+                    
                     if (currentSeconds !== -1 && overlayData.timer_seconds > currentSeconds) {
                         if (overlayData.timer_seconds % 60 === 0 && overlayData.timer_seconds > 0) {
                             timerDisplay.classList.remove('flash');
