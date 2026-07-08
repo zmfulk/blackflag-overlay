@@ -21,7 +21,7 @@
             overflow: hidden;
         }
 
-        /* --- THEMED WEBCAM FRAME --- */
+        /* Webcam frame */
         .webcam-container {
             position: absolute;
             top: 50%;
@@ -41,15 +41,12 @@
             border-radius: 4px;
             padding: 2px; 
             
-            /* The Saber Gradient: dark red base with a glowing bright red edge */
             background: conic-gradient(from var(--angle), #3a0404 0%, #5a0707 85%, #ac0e0e 100%);
 
-            /* Magic Mask: Hides the center so your camera feed stays transparent */
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             
-            /* The Animation */
             animation: spin-saber 12s linear infinite;
             z-index: -1;
         }
@@ -74,7 +71,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* --- STATS BAR (Under Webcam) --- */
+        /*  STATS BAR  */
         .stats-bar {
             position: absolute;
             top: calc(50% + 126px); 
@@ -85,7 +82,6 @@
             justify-content: space-evenly; 
             align-items: center;
             
-            /* Frosted gradient background */
             background: linear-gradient(to right, rgba(0, 0, 0, 0.95), rgba(5, 0, 0, 0.9), rgba(10, 10, 12, 0.95));
             backdrop-filter: blur(6px);
             
@@ -97,7 +93,6 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.6);
         }
 
-        /* HUD Divider line between the two stats */
         .stats-divider {
             height: 45px;
             width: 2px;
@@ -144,7 +139,7 @@
             transition: transform 0.1s;
         }
 
-        /* --- OBJECTIVE BAR --- */
+        /* OBJECTIVE BAR */
         .objective-bar {
             position: absolute;
             top: 745px;
@@ -216,7 +211,7 @@
             z-index: 2;
         }
 
-        /* --- ANIMUS PARTICLES --- */
+        /* ANIMUS PARTICLES */
         .particle-container {
             position: absolute;
             top: 0;
