@@ -12,7 +12,7 @@ class BlackFlagController(ctk.CTk):
         super().__init__()
 
         self.title("Black Flag Overlay Controller")
-        self.geometry("380x620") # Increased height for the settings section
+        self.geometry("380x720")
         self.attributes("-topmost", True) 
 
         # State Variables
@@ -20,10 +20,12 @@ class BlackFlagController(ctk.CTk):
         self.total_seconds = 0
         self.is_running = False
         self.data_file = "data.js"
+        self.current_objective = ""
         
         # Checkbox Variables
         self.show_topbar_var = ctk.BooleanVar(value=True)
         self.show_webcam_var = ctk.BooleanVar(value=True)
+        self.show_objective_var = ctk.BooleanVar(value=True)
 
         self.load_data()
 
@@ -89,6 +91,25 @@ class BlackFlagController(ctk.CTk):
         self.death_set_btn = ctk.CTkButton(self.death_set_frame, text="Set Deaths", width=80, fg_color="#444444", hover_color="#666666", command=self.set_death_value)
         self.death_set_btn.pack(side="left", padx=5)
 
+        # --- OBJECTIVE SECTION ---
+        self.obj_frame = ctk.CTkFrame(self)
+        self.obj_frame.pack(fill="x", padx=20, pady=10)
+
+        self.obj_label = ctk.CTkLabel(self.obj_frame, text="Current Objective", font=("Georgia", 16, "bold"))
+        self.obj_label.pack(pady=(10, 0))
+
+        self.obj_entry = ctk.CTkEntry(self.obj_frame, placeholder_text="e.g., Hunting El Impoluto", width=250)
+        self.obj_entry.pack(pady=10)
+
+        self.obj_btn_frame = ctk.CTkFrame(self.obj_frame, fg_color="transparent")
+        self.obj_btn_frame.pack(pady=(0, 10))
+
+        self.obj_set_btn = ctk.CTkButton(self.obj_btn_frame, text="Update", width=100, fg_color="#750b0b", hover_color="#a61717", command=self.set_objective)
+        self.obj_set_btn.pack(side="left", padx=5)
+
+        self.obj_clear_btn = ctk.CTkButton(self.obj_btn_frame, text="Clear", width=100, fg_color="#444444", hover_color="#666666", command=self.clear_objective)
+        self.obj_clear_btn.pack(side="left", padx=5)
+
         # --- SETTINGS & HOTKEYS SECTION ---
         self.settings_frame = ctk.CTkFrame(self)
         self.settings_frame.pack(fill="x", padx=20, pady=10)
@@ -110,6 +131,9 @@ class BlackFlagController(ctk.CTk):
 
         self.webcam_cb = ctk.CTkCheckBox(self.checkbox_frame, text="Show Webcam Frame", variable=self.show_webcam_var, command=self.save_data)
         self.webcam_cb.pack(side="left", padx=10)
+
+        self.obj_cb = ctk.CTkCheckBox(self.settings_frame, text="Show Objective", variable=self.show_objective_var, command=self.save_data)
+        self.obj_cb.pack(pady=(5, 10))
 
         # --- GLOBAL HOTKEYS ---
         keyboard.add_hotkey('ctrl+shift+p', lambda: self.after(0, self.toggle_timer))
@@ -139,6 +163,15 @@ class BlackFlagController(ctk.CTk):
             self.deaths -= 1
             self.death_display.configure(text=str(self.deaths))
             self.save_data()
+    
+    def set_objective(self):
+        self.current_objective = self.obj_entry.get()
+        self.save_data()
+        
+    def clear_objective(self):
+        self.obj_entry.delete(0, 'end')
+        self.current_objective = ""
+        self.save_data()
 
     def reset_timer(self):
         self.is_running = False
@@ -187,8 +220,10 @@ class BlackFlagController(ctk.CTk):
             "timer_seconds": self.total_seconds,
             "timer_string": self.format_time(self.total_seconds),
             "is_running": self.is_running,
+            "current_objective": self.current_objective,
             "show_topbar": self.show_topbar_var.get(),
-            "show_webcam": self.show_webcam_var.get()
+            "show_webcam": self.show_webcam_var.get(),
+            "show_objective": self.show_objective_var.get()
         }
         try:
             with open(self.data_file, "w") as f:
@@ -207,10 +242,15 @@ class BlackFlagController(ctk.CTk):
                     self.deaths = data.get("deaths", 0)
                     self.total_seconds = data.get("timer_seconds", 0)
                     self.is_running = False
+
+                    self.current_objective = data.get("current_objective", "")
+                    if self.current_objective:
+                        self.obj_entry.insert(0, self.current_objective)
                     
                     # Load visibility preferences
                     self.show_topbar_var.set(data.get("show_topbar", True))
                     self.show_webcam_var.set(data.get("show_webcam", True))
+                    self.show_objective_var.set(data.get("show_objective", True))
             except:
                 pass
 

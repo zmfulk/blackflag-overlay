@@ -60,7 +60,7 @@
         /* --- STATS BAR (Under Webcam) --- */
         .stats-bar {
             position: absolute;
-            top: calc(50% + 140px); 
+            top: calc(50% + 125px); 
             right: 40px;
             width: 426px; 
             
@@ -69,8 +69,8 @@
             align-items: center;
             
             /* Frosted gradient background */
-            background: linear-gradient(to right, rgba(100, 0, 0, 0.8), rgba(5, 0, 0, 0.9), rgba(10, 10, 12, 1));
-            backdrop-filter: blur(6px); /* Blurs the game behind the stats */
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.95), rgba(5, 0, 0, 0.9), rgba(10, 10, 12, 0.95));
+            backdrop-filter: blur(6px);
             
             border: 2px solid #750b0b; 
             border-top: 1px solid #a61717; 
@@ -127,6 +127,47 @@
             transition: transform 0.1s;
         }
 
+        /* --- OBJECTIVE BAR --- */
+        .objective-bar {
+            position: absolute;
+            top: 745px;
+            right: 40px;
+            width: 426px; 
+            
+            display: none;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 15px;
+            
+            background: rgba(15, 15, 18, 0.95);
+            border: 2px solid #750b0b; 
+            border-radius: 6px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+
+        .objective-text {
+            font-size: 16px;
+            color: #ffffff;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
+        .objective-icon {
+            font-size: 14px;
+            margin-right: 6px;
+        }
+
+        .objective-prefix {
+            font-size: 14px;
+            color: #ffffff;
+            margin-right: 8px;
+        }
+
         @keyframes flashRed {
             0% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); }
             50% { color: #ff3333; text-shadow: 0 0 25px #ff3333, 0 0 10px #ff3333; transform: scale(1.15); }
@@ -144,6 +185,8 @@
     <div class="webcam-container" id="webcam-frame">
         <div class="webcam-label">theFunkySoul</div>
     </div>
+
+    
 
     <div class="stats-bar" id="stats-bar">
         <div class="stat-item">
@@ -165,13 +208,23 @@
         </div>
     </div>
 
+    <div class="objective-bar" id="objective-bar">
+        <div class="objective-text">
+            <span class="objective-prefix">CURRENT OBJ:</span>
+            <span id="objective-display"></span>
+        </div>
+    </div>
+
     <script>
         const timerDisplay = document.getElementById('timer-display');
         const deathDisplay = document.getElementById('death-display');
         const statsBar = document.getElementById('stats-bar');
         const webcamFrame = document.getElementById('webcam-frame');
+        const objectiveBar = document.getElementById('objective-bar');
+        const objectiveDisplay = document.getElementById('objective-display');
         
         let currentDeaths = -1; 
+        let currentSeconds = -1;
 
         function updateOverlay() {
             const script = document.createElement('script');
@@ -193,6 +246,18 @@
                         webcamFrame.style.display = "none";
                     }
 
+                    // Update Objective
+                    if (overlayData.current_objective && overlayData.current_objective.trim() !== "") {
+                        objectiveDisplay.innerText = overlayData.current_objective;
+                        if (overlayData.show_objective !== false) {
+                            objectiveBar.style.display = "flex";
+                        } else {
+                            objectiveBar.style.display = "none";
+                        }
+                    } else {
+                        objectiveBar.style.display = "none";
+                    }
+
                     // Update Timer
                     timerDisplay.innerText = overlayData.timer_string;
                     if (overlayData.is_running) {
@@ -209,6 +274,16 @@
                     }
                     deathDisplay.innerText = overlayData.deaths;
                     currentDeaths = overlayData.deaths;
+
+                    // Trigger Flash every 60 seconds)
+                    if (currentSeconds !== -1 && overlayData.timer_seconds > currentSeconds) {
+                        if (overlayData.timer_seconds % 60 === 0 && overlayData.timer_seconds > 0) {
+                            timerDisplay.classList.remove('flash');
+                            void timerDisplay.offsetWidth; // Force a DOM reflow
+                            timerDisplay.classList.add('flash');
+                        }
+                    }
+                    currentSeconds = overlayData.timer_seconds;
                 }
                 
                 document.head.removeChild(script);
