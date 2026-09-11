@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------------------------------------------------
+1. Initial Extraction
+
+To ensure the application has the proper permissions to read and write your data, you must extract the files before running anything.
+
+Download the latest .zip release from the GitHub repository.
+
+Right-click the downloaded .zip file and select Extract All.
+
+Choose a permanent location on your PC for the overlay (e.g., your Documents folder).
+
+Important: Do not separate the files. The app.exe, overlay.html, data.json, and any associated image folders must always stay together in the same directory for the controller to properly communicate with the overlay.
+
+----------------------------------------------------------------------------------------------------------------------
+2. OBS Studio Setup
+
+Next, we will link the visual overlay to your streaming software.
+
+Open OBS Studio and navigate to your desired scene.
+
+Click the + icon in the Sources dock and select Browser.
+
+Name the source something identifiable, like "AC Black Flag Overlay", and click OK.
+
+In the properties window, check the box that says Local file.
+
+Click Browse and navigate to your extracted folder to select the overlay.html file.
+
+Set the Width to 1920 and the Height to 1080.
+
+Scroll down and click OK. The overlay is now securely hooked into your scene.
+
+----------------------------------------------------------------------------------------------------------------------
+3. Operating the Controller
+
+With the overlay active in OBS, you are ready to manage it.
+
+Open your extracted folder and double-click app.exe to launch the controller GUI.
+
+(Note: If Windows Defender displays a "Windows protected your PC" popup, click "More info" and then "Run anyway". This happens with most custom, unsigned executables).
+
+Use the interface to adjust your in-game stats, tracked items, or text fields.
+
+As you make changes or click save, the controller will automatically write the new data and push it instantly to OBS without requiring a manual refresh.
+----------------------------------------------------------------------------------------------------------------------

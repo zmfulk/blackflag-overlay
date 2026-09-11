@@ -1,9 +1,14 @@
 <!DOCTYPE html>
+<!-- Root document for the Black Flag streaming overlay. -->
 <html lang="en">
 <head>
+    <!-- Character encoding keeps symbols such as the timer and skull icon readable. -->
     <meta charset="UTF-8">
+    <!-- Browser title used when the file is opened directly. -->
     <title>Black Flag Stream Overlay</title>
+
     <style>
+        /* Apply consistent sizing, typography, spacing, and text behavior everywhere. */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,6 +18,7 @@
             user-select: none; 
         }
 
+        /* Match the intended 1920x1080 streaming canvas and hide overflow. */
         body {
             width: 1920px;
             height: 1080px;
@@ -21,7 +27,8 @@
             overflow: hidden;
         }
 
-        /* Webcam frame */
+        
+        /* Position and style the webcam frame on the right side of the canvas. */
         .webcam-container {
             position: absolute;
             top: 50%;
@@ -34,7 +41,9 @@
             border-radius: 4px;
         }
 
+        /* Draw an animated masked gradient border around the webcam frame. */
         .webcam-container::before {
+            /* Animated gradient border surrounding the webcam frame. */
             content: "";
             position: absolute;
             inset: -2px; 
@@ -45,12 +54,14 @@
 
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask-composite: exclude;
             
             animation: spin-saber 12s linear infinite;
             z-index: -1;
         }
 
+        /* Display the streamer name in a red tab above the webcam frame. */
         .webcam-label {
             position: absolute;
             top: -26px;
@@ -71,8 +82,10 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /*  STATS BAR  */
+        
+        /* Place the timer and desync counter directly beneath the webcam. */
         .stats-bar {
+            /* Displays the live timer and desync counter beneath the webcam. */
             position: absolute;
             top: calc(50% + 126px); 
             right: 38px;
@@ -93,6 +106,7 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.6);
         }
 
+        /* Separate the two statistics with a glowing vertical line. */
         .stats-divider {
             height: 45px;
             width: 2px;
@@ -100,6 +114,7 @@
             box-shadow: 0 0 5px rgba(166, 23, 23, 0.5);
         }
 
+        /* Arrange each statistic's icon and text horizontally. */
         .stat-item {
             display: flex;
             align-items: center;
@@ -108,21 +123,24 @@
             justify-content: center;
         }
 
+        /* Size and glow the statistic icons. */
         .stat-icon {
             font-size: 24px;
-            filter: drop-shadow(0 0 6px rgba(166, 23, 23, 0.7)); /* Makes emojis glow cleanly */
+            filter: drop-shadow(0 0 6px rgba(166, 23, 23, 0.7));
         }
 
+        /* Stack each statistic label above its value. */
         .stat-text-container {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
         }
 
+        /* Format the small descriptive label for each statistic. */
         .stat-label {
             font-size: 12px;
             color: #ffffff;
-            font-variant: small-caps; /* Gives it a classic, elegant look */
+            font-variant: small-caps;
             letter-spacing: 2px;
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
@@ -130,16 +148,18 @@
             margin-top: 7px;
         }
 
+        /* Format the large live value shown for each statistic. */
         .stat-value {
             font-size: 26px;
             font-weight: bold;
             color: #ff0000; 
             font-family: 'Courier New', Courier, monospace; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255, 0, 0, 0.5); /* Ambient red glow */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255, 0, 0, 0.5);
             transition: transform 0.1s;
         }
 
-        /* OBJECTIVE BAR */
+        
+        /* Optional objective panel; JavaScript displays it when text is available. */
         .objective-bar {
             position: absolute;
             top: 745px;
@@ -157,6 +177,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
 
+        /* Format the current objective text. */
         .objective-text {
             font-size: 16px;
             color: #ffffff;
@@ -169,11 +190,13 @@
             align-items: center;
         }
 
+        /* Reserve styling for an optional objective icon. */
         .objective-icon {
             font-size: 14px;
             margin-right: 6px;
         }
 
+        /* Style any text placed before the objective. */
         .objective-prefix {
             font-size: 14px;
             color: #ffffff;
@@ -181,6 +204,7 @@
         }
 
         
+        /* Size and shade the logo displayed in the webcam label. */
         .ac-logo {
             height: 14px; 
             width: auto;
@@ -189,30 +213,36 @@
             filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8)); 
         }
 
+        /* Animate a brief red highlight when a statistic changes. */
         @keyframes flashRed {
             0% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); }
             50% { color: #ff3333; text-shadow: 0 0 25px #ff3333, 0 0 10px #ff3333; transform: scale(1.15); }
             100% { color: #a61717; text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(117,11,11,0.5); transform: scale(1); }
         }
 
+        /* Register the custom angle property used by the rotating border. */
         @property --angle {
             syntax: '<angle>';
             initial-value: 0deg;
             inherits: false;
         }
 
+        /* Rotate the webcam border gradient continuously. */
         @keyframes spin-saber {
             from { --angle: 0deg; }
             to { --angle: 360deg; }
         }
 
+        /* Keep statistics above the decorative particle layer. */
         .stat-item, .stats-divider {
             position: relative;
             z-index: 2;
         }
 
-        /* ANIMUS PARTICLES */
+        
+        /* Clip decorative particles to the inside of the statistics panel. */
         .particle-container {
+            /* Keeps decorative particles inside the stats panel. */
             position: absolute;
             top: 0;
             left: 0;
@@ -224,6 +254,7 @@
             border-radius: 4px;
         }
 
+        /* Define the appearance and animation base for each particle. */
         .animus-particle {
             position: absolute;
             bottom: -15px; 
@@ -233,6 +264,7 @@
             animation: float-up linear infinite;
         }
 
+        /* Move particles upward while fading them in and out. */
         @keyframes float-up {
             0% { transform: translateY(0); opacity: 0; }
             20% { opacity: 0.6; } 
@@ -240,6 +272,7 @@
             100% { transform: translateY(-90px); opacity: 0; } 
         }
         
+        /* Utility class applied briefly to changed values. */
         .flash {
             animation: flashRed 0.6s ease-out;
             display: inline-block;
@@ -247,6 +280,7 @@
     </style>
 </head>
 <body>
+    <!-- Webcam frame and streamer branding. -->
 
     
 
@@ -259,10 +293,13 @@
 
     
 
+    <!-- Live statistics panel. -->
     <div class="stats-bar" id="stats-bar">
 
+        <!-- Particles are generated dynamically by JavaScript. -->
         <div class="particle-container" id="particle-container"></div>
 
+        <!-- Elapsed play time statistic. -->
         <div class="stat-item">
             <span class="stat-icon">⏳</span>
             <div class="stat-text-container">
@@ -271,8 +308,10 @@
             </div>
         </div>
         
+        <!-- Visual separator between the statistics. -->
         <div class="stats-divider"></div>
         
+        <!-- Desync count statistic. -->
         <div class="stat-item">
             <span class="stat-icon">☠️</span>
             <div class="stat-text-container">
@@ -282,6 +321,7 @@
         </div>
     </div>
 
+    <!-- Optional current-objective panel, hidden until populated. -->
     <div class="objective-bar" id="objective-bar">
         <div class="objective-text">
             <span class="objective-prefix"></span>
@@ -290,6 +330,7 @@
     </div>
 
     <script>
+        // Cache references to the DOM elements updated by the overlay data.
         const timerDisplay = document.getElementById('timer-display');
         const deathDisplay = document.getElementById('death-display');
         const statsBar = document.getElementById('stats-bar');
@@ -297,14 +338,18 @@
         const objectiveBar = document.getElementById('objective-bar');
         const objectiveDisplay = document.getElementById('objective-display');
         
+        // Sentinel values prevent change animations during the first data load.
         let currentDeaths = -1; 
         let currentSeconds = -1;
 
+        // Create lightweight decorative particles inside the statistics panel.
         function spawnAnimusParticles() {
+            // Create a fixed set of particles so the overlay remains lightweight.
             const container = document.getElementById('particle-container');
             const particleCount = 12; 
 
             for (let i = 0; i < particleCount; i++) {
+                // Build one particle element and assign randomized motion settings.
                 let particle = document.createElement('div');
                 particle.classList.add('animus-particle');
 
@@ -325,29 +370,35 @@
             }
         }
         
+        // Populate the panel once; particles loop through their CSS animation.
         spawnAnimusParticles();
 
+        // Load the latest generated data and apply it to the overlay.
         function updateOverlay() {
+            // Reload the generated data file so changes appear without refreshing the overlay.
+            // Use a cache-busting query so each poll reads the newest data file.
             const script = document.createElement('script');
             script.src = 'data.js?cache_bypass=' + Date.now();
             
+            // Update all visible values after the data script has loaded.
             script.onload = function() {
                 if (typeof overlayData !== 'undefined') {
                     
-                    // Update Visibility
+                    // Toggle the statistics panel according to the configuration.
                     if (overlayData.show_topbar !== false) {
                         statsBar.style.display = "flex";
                     } else {
                         statsBar.style.display = "none";
                     }
 
+                    // Toggle the webcam frame independently from the statistics panel.
                     if (overlayData.show_webcam !== false) {
                         webcamFrame.style.display = "block";
                     } else {
                         webcamFrame.style.display = "none";
                     }
 
-                    // Update Objective
+                    // Show the objective only when text exists and it has not been disabled.
                     if (overlayData.current_objective && overlayData.current_objective.trim() !== "") {
                         objectiveDisplay.innerText = overlayData.current_objective;
                         if (overlayData.show_objective !== false) {
@@ -360,6 +411,7 @@
                     }
 
                     
+                    // Update the timer text and use gray while the timer is stopped.
                     timerDisplay.innerText = overlayData.timer_string;
                     if (overlayData.is_running) {
                         timerDisplay.style.color = "#ff0000";
@@ -368,6 +420,7 @@
                     }
 
                     
+                    // Flash the death counter when the number of desyncs increases.
                     if (currentDeaths !== -1 && overlayData.deaths > currentDeaths) {
                         deathDisplay.classList.remove('flash');
                         void deathDisplay.offsetWidth; 
@@ -377,6 +430,7 @@
                     currentDeaths = overlayData.deaths;
 
                     
+                    // Flash the timer at each completed minute while it advances.
                     if (currentSeconds !== -1 && overlayData.timer_seconds > currentSeconds) {
                         if (overlayData.timer_seconds % 60 === 0 && overlayData.timer_seconds > 0) {
                             timerDisplay.classList.remove('flash');
@@ -393,6 +447,7 @@
             document.head.appendChild(script);
         }
 
+        // Poll once per second and also perform an immediate initial update.
         setInterval(updateOverlay, 1000);
         updateOverlay();
     </script>
